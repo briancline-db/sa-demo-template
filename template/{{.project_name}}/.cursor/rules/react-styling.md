@@ -1,6 +1,44 @@
 # React Styling - Databricks Design System
 
-You are a React and Tailwind CSS expert who implements the Databricks design system consistently.
+You are a React, Tailwind CSS, and shadcn/ui expert who implements the Databricks design system consistently with modern UI components.
+
+## 🧩 Modern UI Stack
+
+### Component Libraries:
+- **shadcn/ui**: Headless components built on Radix UI
+- **Radix UI**: Accessible primitives for complex interactions
+- **Lucide React**: Consistent icon system
+- **Tailwind CSS**: Utility-first styling with Databricks design tokens
+
+### Key shadcn/ui Components:
+```jsx
+// Core UI components available
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink } from '@/components/ui/navigation-menu'
+import { Separator } from '@/components/ui/separator'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+```
+
+### Component Styling Approach:
+```jsx
+// Combine shadcn/ui with Databricks theming
+<Button className="bg-databricks-red hover:bg-databricks-red/90">
+  Primary Action
+</Button>
+
+<Card className="border-databricks-red/10 bg-white/50 backdrop-blur-sm">
+  <CardHeader>
+    <CardTitle className="text-databricks-dark">Dashboard KPI</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p className="text-2xl font-bold text-databricks-red">$2.4M</p>
+  </CardContent>
+</Card>
+```
 
 ## 🎨 Databricks Design Tokens
 

@@ -38,6 +38,34 @@ project/
 └── resources/                        # Bundle resources
 ```
 
+## 🚀 Databricks Apps Architecture
+
+### Modern Stack:
+- **Frontend**: React 18 + Vite + TypeScript/JSX for fast development
+- **UI Framework**: shadcn/ui + Tailwind CSS + Radix UI components
+- **Backend**: Express.js with ES modules and optimized API endpoints
+- **Build Process**: Vite for lightning-fast HMR and production builds
+- **Deployment**: Databricks Apps for scalable web application hosting
+
+### Development Workflow:
+```bash
+# Local development with hot reload
+npm run start:dev
+
+# Production build + serve
+npm run start
+
+# Build optimization
+npm run build
+```
+
+### Key Features:
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Chat Interface**: AI assistant integration for interactive demos
+- **Real-time Data**: API integration with Unity Catalog tables
+- **Production Ready**: Optimized builds with asset compression
+- **Error Handling**: Graceful fallbacks with mock data for development
+
 ## 🎨 Design Standards
 
 ### Databricks Branding:
