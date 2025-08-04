@@ -12,7 +12,7 @@ targets:
           name: {{.project_name}}_job
           tasks:
             - task_key: generate_data
-              python_task:
+              spark_python_task:
                 python_file: ./src/project_name/main.py
               job_cluster_key: job_cluster
           job_clusters:
