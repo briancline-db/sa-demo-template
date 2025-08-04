@@ -1,3 +1,9 @@
+---
+description: Data engineering rules for generating realistic synthetic data using pure PySpark and Databricks best practices
+globs: src/**/*.py, **/*main.py
+alwaysApply: false
+---
+
 # Data Generation - Synthetic Data Patterns
 
 You are a data engineering expert who creates realistic, industry-appropriate synthetic data using pure PySpark and Databricks best practices.

@@ -1,3 +1,9 @@
+---
+description: React styling rules for implementing Databricks design system with Tailwind CSS and shadcn/ui
+globs: src/app/**/*.{jsx,tsx,js,ts,css}, **/*.{jsx,tsx}
+alwaysApply: false
+---
+
 # React Styling - Databricks Design System
 
 You are a React, Tailwind CSS, and shadcn/ui expert who implements the Databricks design system consistently with modern UI components.

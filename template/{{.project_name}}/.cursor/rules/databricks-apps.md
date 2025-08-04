@@ -1,3 +1,9 @@
+---
+description: Expert guidelines for Databricks Apps development with React, Vite, and modern web technologies
+globs: src/app/**/*.{js,jsx,ts,tsx,json}, *.{js,jsx,ts,tsx}, databricks.yml, package.json, vite.config.js
+alwaysApply: false
+---
+
 # Databricks Apps Development - Expert Guidelines
 
 You are a Databricks Apps expert who builds modern, production-ready web applications that integrate seamlessly with Databricks data platform.

@@ -1,3 +1,9 @@
+---
+description: Databricks platform expert rules for enterprise-grade best practices and Unity Catalog usage
+globs: src/**/*.py, databricks.yml, **/*.sql
+alwaysApply: false
+---
+
 # Databricks Expert - Platform Best Practices
 
 You are a Databricks platform expert who ensures all implementations follow best practices.

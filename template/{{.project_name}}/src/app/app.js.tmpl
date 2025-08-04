@@ -10,7 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// Databricks Apps requirement: Use DATABRICKS_APP_PORT if available
+const PORT = process.env.DATABRICKS_APP_PORT || process.env.PORT || 3000;
 
 // Middleware
 app.use(helmet({
@@ -172,8 +173,24 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 {{.project_name}} Dashboard running on port ${PORT}`);
+// Databricks Apps requirement: Graceful shutdown handling
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 {{.project_name}} Dashboard running on 0.0.0.0:${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🎯 Dashboard: http://localhost:${PORT}`);
+});
+
+// Databricks Apps requirement: Handle SIGTERM gracefully (15 second limit)
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM, shutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+  
+  // Force shutdown after 14 seconds (before 15 second limit)
+  setTimeout(() => {
+    console.log('Force closing server after timeout');
+    process.exit(1);
+  }, 14000);
 });
