@@ -4,9 +4,8 @@ resources:
       name: {{.project_name}}_job
       tasks:
         - task_key: generate_data
-          notebook_task:
-            notebook_path: ./src/project_name/main.py
-            source: WORKSPACE
+          python_task:
+            python_file: ./src/project_name/main.py
           job_cluster_key: job_cluster
       job_clusters:
         - job_cluster_key: job_cluster
