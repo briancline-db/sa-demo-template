@@ -50,8 +50,8 @@ def generate_retail_data(spark, data_scale="medium"):
      .withColumn("customer_segment", "string", values=["bronze", "silver", "gold", "platinum"], weights=[0.5, 0.3, 0.15, 0.05]) \
      .withColumn("lifetime_value", "decimal(10,2)", minValue=100, maxValue=50000, distribution="normal") \
      .withColumn("churn_risk", "decimal(3,2)", minValue=0.0, maxValue=1.0, distribution="normal") \
-     .withColumn("created_date", "timestamp", begin="2020-01-01", end="2024-01-01") \
-     .withColumn("last_purchase_date", "timestamp", begin="2020-01-01", end="2024-01-01") \
+     .withColumn("created_date", "timestamp", begin="2020-01-01 00:00:00", end="2024-01-01 23:59:59") \
+     .withColumn("last_purchase_date", "timestamp", begin="2020-01-01 00:00:00", end="2024-01-01 23:59:59") \
      .withColumn("total_purchases", "integer", minValue=0, maxValue=200, distribution="poisson") \
      .withColumn("avg_order_value", "decimal(10,2)", minValue=25, maxValue=500, distribution="normal")
     
@@ -76,7 +76,7 @@ def generate_retail_data(spark, data_scale="medium"):
      .withColumn("reorder_point", "integer", minValue=10, maxValue=100) \
      .withColumn("supplier_id", "string", template=r'SUP\\d{4}') \
      .withColumn("is_active", "boolean", values=[True, False], weights=[0.9, 0.1]) \
-     .withColumn("created_date", "timestamp", begin="2019-01-01", end="2024-01-01")
+     .withColumn("created_date", "timestamp", begin="2019-01-01 00:00:00", end="2024-01-01 23:59:59")
     
     products_df = products_df.build()
     product_ids = [row.product_id for row in products_df.select("product_id").collect()]
@@ -91,7 +91,7 @@ def generate_retail_data(spark, data_scale="medium"):
      .withColumn("transaction_id", "string", uniqueValues=base_rows) \
      .withColumn("customer_id", "string", values=customer_ids) \
      .withColumn("product_id", "string", values=product_ids) \
-     .withColumn("transaction_date", "timestamp", begin="2023-01-01", end="2024-01-01", distribution="normal") \
+     .withColumn("transaction_date", "timestamp", begin="2023-01-01 00:00:00", end="2024-01-01 23:59:59", distribution="normal") \
      .withColumn("quantity", "integer", minValue=1, maxValue=10, distribution="poisson") \
      .withColumn("unit_price", "decimal(10,2)", minValue=10, maxValue=500, distribution="lognormal") \
      .withColumn("total_amount", "decimal(10,2)", expr="quantity * unit_price") \
@@ -169,7 +169,7 @@ def generate_supply_chain_data(spark, data_scale="medium"):
      .withColumn("shipment_id", "string", uniqueValues=base_rows) \
      .withColumn("supplier_id", "string", values=supplier_ids) \
      .withColumn("product_id", "string", values=product_ids) \
-     .withColumn("order_date", "timestamp", begin="2023-01-01", end="2024-01-01") \
+     .withColumn("order_date", "timestamp", begin="2023-01-01 00:00:00", end="2024-01-01 23:59:59") \
      .withColumn("ship_date", "timestamp", expr="order_date + interval (rand() * 30) days") \
      .withColumn("expected_delivery", "timestamp", expr="ship_date + interval (rand() * 14 + 3) days") \
      .withColumn("actual_delivery", "timestamp", expr="expected_delivery + interval (rand() * 10 - 5) days") \
@@ -213,7 +213,7 @@ def generate_finance_data(spark, data_scale="medium"):
      .withColumn("income", "decimal(10,2)", minValue=20000, maxValue=500000, distribution="lognormal") \
      .withColumn("credit_score", "integer", minValue=300, maxValue=850, distribution="normal") \
      .withColumn("risk_level", "string", values=["low", "medium", "high"], weights=[0.6, 0.3, 0.1]) \
-     .withColumn("created_date", "timestamp", begin="2015-01-01", end="2024-01-01")
+     .withColumn("created_date", "timestamp", begin="2015-01-01 00:00:00", end="2024-01-01 23:59:59")
     
     customers_df = customers_df.build()
     customer_ids = [row.customer_id for row in customers_df.select("customer_id").collect()]
@@ -233,8 +233,8 @@ def generate_finance_data(spark, data_scale="medium"):
      .withColumn("interest_rate", "decimal(5,4)", minValue=0.01, maxValue=0.25, distribution="normal") \
      .withColumn("risk_score", "integer", minValue=300, maxValue=850, distribution="normal") \
      .withColumn("account_status", "string", values=["active", "suspended", "closed"], weights=[0.95, 0.03, 0.02]) \
-     .withColumn("opened_date", "timestamp", begin="2015-01-01", end="2024-01-01") \
-     .withColumn("last_activity", "timestamp", begin="2023-01-01", end="2024-01-01")
+     .withColumn("opened_date", "timestamp", begin="2015-01-01 00:00:00", end="2024-01-01 23:59:59") \
+     .withColumn("last_activity", "timestamp", begin="2023-01-01 00:00:00", end="2024-01-01 23:59:59")
     
     accounts_df = accounts_df.build()
     account_ids = [row.account_id for row in accounts_df.select("account_id").collect()]
@@ -248,7 +248,7 @@ def generate_finance_data(spark, data_scale="medium"):
     ).withIdOutput() \
      .withColumn("transaction_id", "string", uniqueValues=base_rows) \
      .withColumn("account_id", "string", values=account_ids) \
-     .withColumn("transaction_date", "timestamp", begin="2023-01-01", end="2024-01-01", distribution="normal") \
+     .withColumn("transaction_date", "timestamp", begin="2023-01-01 00:00:00", end="2024-01-01 23:59:59", distribution="normal") \
      .withColumn("amount", "decimal(12,2)", minValue=1, maxValue=10000, distribution="lognormal") \
      .withColumn("transaction_type", "string", values=["deposit", "withdrawal", "transfer", "payment", "fee"], weights=[0.3, 0.25, 0.2, 0.2, 0.05]) \
      .withColumn("merchant_category", "string", values=["retail", "restaurant", "gas", "online", "utilities", "entertainment"], weights=[0.3, 0.2, 0.15, 0.2, 0.1, 0.05]) \
