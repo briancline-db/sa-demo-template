@@ -39,7 +39,7 @@ def generate_retail_data(spark, data_scale="medium"):
         rows=base_rows,
         partitions=4
     ).withIdOutput() \
-     .withColumn("customer_id", "string", uniqueValues=True) \
+     .withColumn("customer_id", "string", uniqueValues=base_rows) \
      .withColumn("first_name", "string", template=r'\\w{3,8}') \
      .withColumn("last_name", "string", template=r'\\w{4,10}') \
      .withColumn("email", "string", template=r'\\w{5,10}@\\w{3,8}\\.com') \
@@ -65,7 +65,7 @@ def generate_retail_data(spark, data_scale="medium"):
         rows=base_rows // 2,
         partitions=4
     ).withIdOutput() \
-     .withColumn("product_id", "string", uniqueValues=True) \
+     .withColumn("product_id", "string", uniqueValues=base_rows) \
      .withColumn("product_name", "string", template=r'Product \\w{3,8}') \
      .withColumn("category", "string", values=["electronics", "clothing", "home", "sports", "books", "beauty"], weights=[0.2, 0.25, 0.2, 0.15, 0.1, 0.1]) \
      .withColumn("subcategory", "string", template=r'Sub-\\w{4,8}') \
@@ -88,7 +88,7 @@ def generate_retail_data(spark, data_scale="medium"):
         rows=base_rows * 5,
         partitions=8
     ).withIdOutput() \
-     .withColumn("transaction_id", "string", uniqueValues=True) \
+     .withColumn("transaction_id", "string", uniqueValues=base_rows) \
      .withColumn("customer_id", "string", values=customer_ids) \
      .withColumn("product_id", "string", values=product_ids) \
      .withColumn("transaction_date", "timestamp", begin="2023-01-01", end="2024-01-01", distribution="normal") \
@@ -124,7 +124,7 @@ def generate_supply_chain_data(spark, data_scale="medium"):
         rows=base_rows,
         partitions=4
     ).withIdOutput() \
-     .withColumn("supplier_id", "string", uniqueValues=True) \
+     .withColumn("supplier_id", "string", uniqueValues=base_rows) \
      .withColumn("supplier_name", "string", template=r'Supplier \\w{4,10}') \
      .withColumn("contact_person", "string", template=r'\\w{3,8} \\w{4,10}') \
      .withColumn("email", "string", template=r'contact@\\w{4,10}\\.com') \
@@ -146,7 +146,7 @@ def generate_supply_chain_data(spark, data_scale="medium"):
         rows=base_rows * 2,
         partitions=4
     ).withIdOutput() \
-     .withColumn("product_id", "string", uniqueValues=True) \
+     .withColumn("product_id", "string", uniqueValues=base_rows) \
      .withColumn("product_name", "string", template=r'Product \\w{4,8}') \
      .withColumn("category", "string", values=["raw_materials", "components", "finished_goods", "packaging"], weights=[0.3, 0.4, 0.2, 0.1]) \
      .withColumn("sku", "string", template=r'SKU\\d{6}') \
@@ -166,7 +166,7 @@ def generate_supply_chain_data(spark, data_scale="medium"):
         rows=base_rows * 3,
         partitions=6
     ).withIdOutput() \
-     .withColumn("shipment_id", "string", uniqueValues=True) \
+     .withColumn("shipment_id", "string", uniqueValues=base_rows) \
      .withColumn("supplier_id", "string", values=supplier_ids) \
      .withColumn("product_id", "string", values=product_ids) \
      .withColumn("order_date", "timestamp", begin="2023-01-01", end="2024-01-01") \
@@ -204,7 +204,7 @@ def generate_finance_data(spark, data_scale="medium"):
         rows=base_rows // 2,
         partitions=4
     ).withIdOutput() \
-     .withColumn("customer_id", "string", uniqueValues=True) \
+     .withColumn("customer_id", "string", uniqueValues=base_rows) \
      .withColumn("first_name", "string", template=r'\\w{3,8}') \
      .withColumn("last_name", "string", template=r'\\w{4,10}') \
      .withColumn("email", "string", template=r'\\w{5,10}@\\w{3,8}\\.com') \
@@ -225,7 +225,7 @@ def generate_finance_data(spark, data_scale="medium"):
         rows=base_rows,
         partitions=6
     ).withIdOutput() \
-     .withColumn("account_id", "string", uniqueValues=True) \
+     .withColumn("account_id", "string", uniqueValues=base_rows) \
      .withColumn("customer_id", "string", values=customer_ids) \
      .withColumn("account_type", "string", values=["checking", "savings", "credit", "investment"], weights=[0.5, 0.3, 0.15, 0.05]) \
      .withColumn("balance", "decimal(12,2)", minValue=0, maxValue=100000, distribution="lognormal") \
@@ -246,7 +246,7 @@ def generate_finance_data(spark, data_scale="medium"):
         rows=base_rows * 4,
         partitions=10
     ).withIdOutput() \
-     .withColumn("transaction_id", "string", uniqueValues=True) \
+     .withColumn("transaction_id", "string", uniqueValues=base_rows) \
      .withColumn("account_id", "string", values=account_ids) \
      .withColumn("transaction_date", "timestamp", begin="2023-01-01", end="2024-01-01", distribution="normal") \
      .withColumn("amount", "decimal(12,2)", minValue=1, maxValue=10000, distribution="lognormal") \
