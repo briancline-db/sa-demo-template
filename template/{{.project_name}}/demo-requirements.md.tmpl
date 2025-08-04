@@ -23,15 +23,15 @@
 - Time-series data for trend analysis
 - Demographic and behavioral segmentation
 
-{{#if (eq .complexity "standard")}}
+{{if eq .complexity "standard"}}
 ## 🔄 OLTP Requirements
 - Real-time transaction processing with Lakebase
 - Live dashboard updates from operational data
 - CRUD operations for interactive demos
 - Data synchronization between OLTP and analytical stores
-{{/if}}
+{{end}}
 
-{{#if (eq .complexity "advanced")}}
+{{if eq .complexity "advanced"}}
 ## 🔄 OLTP Requirements  
 - Real-time transaction processing with Lakebase
 - Live dashboard updates from operational data
@@ -44,7 +44,7 @@
 - Natural language query capabilities
 - Predictive analytics and forecasting
 - Automated insights and recommendations
-{{/if}}
+{{end}}
 
 ## 🚀 Success Criteria
 - **Professional Impact:** Executive-ready presentation quality
@@ -88,19 +88,19 @@ Implement the demo requirements above using the Databricks Demo Factory template
 - **Features:** Header with branding, KPI grid, visualizations, navigation
 - **Interactions:** Filters, drill-downs, real-time updates
 
-{{#if (gte .complexity "standard")}}
+{{if or (eq .complexity "standard") (eq .complexity "advanced")}}
 #### 5. OLTP Integration
 - **Action:** Add Lakebase PostgreSQL integration
 - **Features:** Real-time data operations, live dashboard updates
 - **Patterns:** Connection pooling, transaction management, sync processes
-{{/if}}
+{{end}}
 
-{{#if (eq .complexity "advanced")}}
+{{if eq .complexity "advanced"}}
 #### 6. LLM Agent Integration
 - **Action:** Integrate Mosaic AI Agent Framework
 - **Features:** Conversational interface, RAG capabilities, NL queries
 - **Implementation:** Chat component, agent API endpoints, context management
-{{/if}}
+{{end}}
 
 ### 🎨 Design Guidelines
 - Use `DatabricksCard` components for KPIs
@@ -111,29 +111,29 @@ Implement the demo requirements above using the Databricks Demo Factory template
 
 ### 📊 Industry-Specific Patterns
 
-{{#if (eq .industry "retail")}}
+{{if eq .industry "retail"}}
 **Retail Focus:**
 - Customer analytics and segmentation
 - Product performance and inventory
 - Sales trends and forecasting
 - Store operations and efficiency
-{{/if}}
+{{end}}
 
-{{#if (eq .industry "supply_chain")}}
+{{if eq .industry "supply_chain"}}
 **Supply Chain Focus:**
 - Supplier performance and relationships
 - Inventory management and optimization
 - Logistics and delivery tracking
 - Risk assessment and mitigation
-{{/if}}
+{{end}}
 
-{{#if (eq .industry "finance")}}
+{{if eq .industry "finance"}}
 **Finance Focus:**
 - Portfolio performance and risk
 - Customer analytics and lifetime value
 - Fraud detection and prevention
 - Regulatory compliance and reporting
-{{/if}}
+{{end}}
 
 ### 🔧 Technical Standards
 - **Error Handling:** Implement comprehensive error boundaries

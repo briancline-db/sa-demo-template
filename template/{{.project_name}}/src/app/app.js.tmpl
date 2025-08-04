@@ -81,7 +81,7 @@ app.get('/api/segments', async (req, res) => {
   }
 });
 
-{{#if (gte .complexity "standard")}}
+{{if or (eq .complexity "standard") (eq .complexity "advanced")}}
 // OLTP endpoints for real-time data
 app.post('/api/transactions', async (req, res) => {
   try {
@@ -115,9 +115,9 @@ app.get('/api/transactions/recent', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch recent transactions' });
   }
 });
-{{/if}}
+{{end}}
 
-{{#if (eq .complexity "advanced")}}
+{{if eq .complexity "advanced"}}
 // LLM Agent endpoints
 app.post('/api/chat', async (req, res) => {
   try {
@@ -150,7 +150,7 @@ app.get('/api/insights', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch insights' });
   }
 });
-{{/if}}
+{{end}}
 
 // Serve the main dashboard
 app.get('/', (req, res) => {
