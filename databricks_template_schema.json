@@ -39,6 +39,5 @@
       "description": "Data volume: small (1K records), medium (10K), large (100K)",
       "order": 7
     }
-  },
-  "required": ["project_name", "workspace_host", "warehouse_id"]
+  }
 } 
