@@ -71,20 +71,21 @@ Implement the demo requirements above using the Databricks Demo Factory template
 - **Quality:** Ensure referential integrity and business logic
 
 #### 2. API Development
-- **File:** `src/app/app.js`
+- **File:** `src/app/app.js` (generated from `app.js.tmpl`)
 - **Action:** Add industry-specific API endpoints
 - **Patterns:** Follow REST conventions, implement proper error handling
 - **Data:** Connect to Unity Catalog tables for dashboard consumption
 
 #### 3. Dashboard Components
-- **Directory:** `src/app/components/`
+- **Directory:** `src/app/src/components/`
 - **Action:** Build React components using Databricks design system
 - **Components:** KPI cards, charts, tables, filters, interactive elements
 - **Styling:** Use Tailwind CSS with Databricks brand colors
+- **Note:** Both `src/app/components/` (template components) and `src/app/src/components/` (React components) exist
 
 #### 4. Main Dashboard
-- **File:** `src/app/public/index.html`
-- **Action:** Create comprehensive dashboard layout
+- **File:** `src/app/src/App.jsx`
+- **Action:** Create comprehensive React dashboard layout
 - **Features:** Header with branding, KPI grid, visualizations, navigation
 - **Interactions:** Filters, drill-downs, real-time updates
 
