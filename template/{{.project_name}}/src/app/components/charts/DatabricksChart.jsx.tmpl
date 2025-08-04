@@ -34,7 +34,7 @@ export function DatabricksChart({
         <div className="bg-white p-3 border border-gray-200 rounded-databricks shadow-lg">
           <p className="text-body-sm font-medium text-databricks-dark">{label}</p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-body-sm" style={{ color: entry.color }}>
+            <p key={index} className="text-body-sm" style={ { color: entry.color } }>
               {`${entry.name}: ${entry.value.toLocaleString()}`}
             </p>
           ))}
@@ -80,7 +80,7 @@ export function DatabricksChart({
             } else if (type === 'bar') {
               return <Bar {...commonProps} fill={color} />;
             } else {
-              return <Line {...commonProps} dot={{ fill: color, strokeWidth: 2 }} />;
+              return <Line {...commonProps} dot={ { fill: color, strokeWidth: 2 } } />;
             }
           })}
         </ChartComponent>
