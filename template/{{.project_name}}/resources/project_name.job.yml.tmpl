@@ -5,18 +5,4 @@ resources:
       tasks:
         - task_key: generate_data
           spark_python_task:
-            python_file: ./src/project_name/main.py
-          job_cluster_key: job_cluster
-      job_clusters:
-        - job_cluster_key: job_cluster
-          new_cluster:
-            spark_version: 14.0.x-scala2.12
-            node_type_id: Standard_DS3_v2
-            num_workers: 1
-            spark_conf:
-              spark.databricks.delta.preview.enabled: true
-              spark.sql.adaptive.enabled: true
-              spark.sql.adaptive.coalescePartitions.enabled: true
-            custom_tags:
-              project: "{{.project_name}}"
-              environment: "dev" 
+            python_file: ./src/project_name/main.py 
