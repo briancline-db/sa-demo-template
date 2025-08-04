@@ -1,0 +1,331 @@
+#!/usr/bin/env python3
+"""
+{{.project_name}} - Data Generation Script
+Generates synthetic data for Databricks demo using dbldatagen
+"""
+
+import os
+import sys
+from datetime import datetime, timedelta
+import random
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+import dbldatagen as dg
+
+def create_spark_session():
+    """Create and configure Spark session"""
+    spark = SparkSession.builder \
+        .appName("{{.project_name}}_data_generation") \
+        .config("spark.sql.adaptive.enabled", "true") \
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+        .config("spark.sql.adaptive.skewJoin.enabled", "true") \
+        .getOrCreate()
+    
+    return spark
+
+def generate_retail_data(spark, data_scale="medium"):
+    """Generate retail industry synthetic data"""
+    
+    # Determine scale
+    scale_map = {"small": 1000, "medium": 10000, "large": 100000}
+    base_rows = scale_map.get(data_scale, 10000)
+    
+    print(f"🎯 Generating retail data with {data_scale} scale ({base_rows} base rows)")
+    
+    # Generate Customers
+    print("📊 Generating customers...")
+    customers_df = dg.DataGenerator(
+        spark,
+        rows=base_rows,
+        partitions=4
+    ).withIdOutput() \
+     .withColumn("customer_id", "string", uniqueValues=True) \
+     .withColumn("first_name", "string", template=r'\\w{3,8}') \
+     .withColumn("last_name", "string", template=r'\\w{4,10}') \
+     .withColumn("email", "string", template=r'\\w{5,10}@\\w{3,8}\\.com') \
+     .withColumn("phone", "string", template=r'\\d{3}-\\d{3}-\\d{4}') \
+     .withColumn("date_of_birth", "date", begin="1960-01-01", end="2005-12-31") \
+     .withColumn("gender", "string", values=["M", "F"], weights=[0.48, 0.52]) \
+     .withColumn("income_level", "string", values=["low", "medium", "high"], weights=[0.4, 0.45, 0.15]) \
+     .withColumn("customer_segment", "string", values=["bronze", "silver", "gold", "platinum"], weights=[0.5, 0.3, 0.15, 0.05]) \
+     .withColumn("lifetime_value", "decimal(10,2)", minValue=100, maxValue=50000, distribution="normal") \
+     .withColumn("churn_risk", "decimal(3,2)", minValue=0.0, maxValue=1.0, distribution="normal") \
+     .withColumn("created_date", "timestamp", begin="2020-01-01", end="2024-01-01") \
+     .withColumn("last_purchase_date", "timestamp", begin="2020-01-01", end="2024-01-01") \
+     .withColumn("total_purchases", "integer", minValue=0, maxValue=200, distribution="poisson") \
+     .withColumn("avg_order_value", "decimal(10,2)", minValue=25, maxValue=500, distribution="normal")
+    
+    customers_df = customers_df.build()
+    customer_ids = [row.customer_id for row in customers_df.select("customer_id").collect()]
+    
+    # Generate Products
+    print("📦 Generating products...")
+    products_df = dg.DataGenerator(
+        spark,
+        rows=base_rows // 2,
+        partitions=4
+    ).withIdOutput() \
+     .withColumn("product_id", "string", uniqueValues=True) \
+     .withColumn("product_name", "string", template=r'Product \\w{3,8}') \
+     .withColumn("category", "string", values=["electronics", "clothing", "home", "sports", "books", "beauty"], weights=[0.2, 0.25, 0.2, 0.15, 0.1, 0.1]) \
+     .withColumn("subcategory", "string", template=r'Sub-\\w{4,8}') \
+     .withColumn("brand", "string", values=["BrandA", "BrandB", "BrandC", "BrandD", "BrandE"], weights=[0.3, 0.25, 0.2, 0.15, 0.1]) \
+     .withColumn("price", "decimal(10,2)", minValue=10, maxValue=1000, distribution="lognormal") \
+     .withColumn("cost", "decimal(10,2)", expr="price * (0.4 + rand() * 0.3)") \
+     .withColumn("inventory_level", "integer", minValue=0, maxValue=500, distribution="poisson") \
+     .withColumn("reorder_point", "integer", minValue=10, maxValue=100) \
+     .withColumn("supplier_id", "string", template=r'SUP\\d{4}') \
+     .withColumn("is_active", "boolean", values=[True, False], weights=[0.9, 0.1]) \
+     .withColumn("created_date", "timestamp", begin="2019-01-01", end="2024-01-01")
+    
+    products_df = products_df.build()
+    product_ids = [row.product_id for row in products_df.select("product_id").collect()]
+    
+    # Generate Transactions
+    print("💰 Generating transactions...")
+    transactions_df = dg.DataGenerator(
+        spark,
+        rows=base_rows * 5,
+        partitions=8
+    ).withIdOutput() \
+     .withColumn("transaction_id", "string", uniqueValues=True) \
+     .withColumn("customer_id", "string", values=customer_ids) \
+     .withColumn("product_id", "string", values=product_ids) \
+     .withColumn("transaction_date", "timestamp", begin="2023-01-01", end="2024-01-01", distribution="normal") \
+     .withColumn("quantity", "integer", minValue=1, maxValue=10, distribution="poisson") \
+     .withColumn("unit_price", "decimal(10,2)", minValue=10, maxValue=500, distribution="lognormal") \
+     .withColumn("total_amount", "decimal(10,2)", expr="quantity * unit_price") \
+     .withColumn("payment_method", "string", values=["credit_card", "debit_card", "cash", "paypal"], weights=[0.6, 0.25, 0.1, 0.05]) \
+     .withColumn("store_id", "string", template=r'STORE\\d{3}') \
+     .withColumn("sales_person_id", "string", template=r'SP\\d{4}') \
+     .withColumn("is_return", "boolean", values=[False, True], weights=[0.95, 0.05]) \
+     .withColumn("return_reason", "string", values=["", "defective", "wrong_size", "not_satisfied"], weights=[0.95, 0.02, 0.02, 0.01])
+    
+    transactions_df = transactions_df.build()
+    
+    return {
+        "customers": customers_df,
+        "products": products_df,
+        "transactions": transactions_df
+    }
+
+def generate_supply_chain_data(spark, data_scale="medium"):
+    """Generate supply chain industry synthetic data"""
+    
+    scale_map = {"small": 500, "medium": 2000, "large": 10000}
+    base_rows = scale_map.get(data_scale, 2000)
+    
+    print(f"🎯 Generating supply chain data with {data_scale} scale ({base_rows} base rows)")
+    
+    # Generate Suppliers
+    print("🏭 Generating suppliers...")
+    suppliers_df = dg.DataGenerator(
+        spark,
+        rows=base_rows,
+        partitions=4
+    ).withIdOutput() \
+     .withColumn("supplier_id", "string", uniqueValues=True) \
+     .withColumn("supplier_name", "string", template=r'Supplier \\w{4,10}') \
+     .withColumn("contact_person", "string", template=r'\\w{3,8} \\w{4,10}') \
+     .withColumn("email", "string", template=r'contact@\\w{4,10}\\.com') \
+     .withColumn("phone", "string", template=r'\\d{3}-\\d{3}-\\d{4}') \
+     .withColumn("country", "string", values=["USA", "China", "Germany", "Japan", "Mexico", "Canada"], weights=[0.4, 0.25, 0.15, 0.1, 0.05, 0.05]) \
+     .withColumn("performance_score", "decimal(3,2)", minValue=0.5, maxValue=1.0, distribution="normal") \
+     .withColumn("lead_time_days", "integer", minValue=1, maxValue=60, distribution="poisson") \
+     .withColumn("quality_rating", "decimal(3,2)", minValue=0.7, maxValue=1.0, distribution="normal") \
+     .withColumn("cost_rating", "decimal(3,2)", minValue=0.5, maxValue=1.0, distribution="normal") \
+     .withColumn("is_active", "boolean", values=[True, False], weights=[0.9, 0.1])
+    
+    suppliers_df = suppliers_df.build()
+    supplier_ids = [row.supplier_id for row in suppliers_df.select("supplier_id").collect()]
+    
+    # Generate Products
+    print("📦 Generating products...")
+    products_df = dg.DataGenerator(
+        spark,
+        rows=base_rows * 2,
+        partitions=4
+    ).withIdOutput() \
+     .withColumn("product_id", "string", uniqueValues=True) \
+     .withColumn("product_name", "string", template=r'Product \\w{4,8}') \
+     .withColumn("category", "string", values=["raw_materials", "components", "finished_goods", "packaging"], weights=[0.3, 0.4, 0.2, 0.1]) \
+     .withColumn("sku", "string", template=r'SKU\\d{6}') \
+     .withColumn("unit_cost", "decimal(10,2)", minValue=5, maxValue=200, distribution="lognormal") \
+     .withColumn("supplier_id", "string", values=supplier_ids) \
+     .withColumn("lead_time_days", "integer", minValue=1, maxValue=30, distribution="poisson") \
+     .withColumn("min_order_quantity", "integer", minValue=10, maxValue=1000, distribution="poisson") \
+     .withColumn("is_active", "boolean", values=[True, False], weights=[0.95, 0.05])
+    
+    products_df = products_df.build()
+    product_ids = [row.product_id for row in products_df.select("product_id").collect()]
+    
+    # Generate Shipments
+    print("🚚 Generating shipments...")
+    shipments_df = dg.DataGenerator(
+        spark,
+        rows=base_rows * 3,
+        partitions=6
+    ).withIdOutput() \
+     .withColumn("shipment_id", "string", uniqueValues=True) \
+     .withColumn("supplier_id", "string", values=supplier_ids) \
+     .withColumn("product_id", "string", values=product_ids) \
+     .withColumn("order_date", "timestamp", begin="2023-01-01", end="2024-01-01") \
+     .withColumn("ship_date", "timestamp", expr="order_date + interval (rand() * 30) days") \
+     .withColumn("expected_delivery", "timestamp", expr="ship_date + interval (rand() * 14 + 3) days") \
+     .withColumn("actual_delivery", "timestamp", expr="expected_delivery + interval (rand() * 10 - 5) days") \
+     .withColumn("quantity", "integer", minValue=10, maxValue=1000, distribution="poisson") \
+     .withColumn("unit_cost", "decimal(10,2)", minValue=5, maxValue=200, distribution="lognormal") \
+     .withColumn("total_cost", "decimal(10,2)", expr="quantity * unit_cost") \
+     .withColumn("shipping_cost", "decimal(10,2)", minValue=50, maxValue=500, distribution="normal") \
+     .withColumn("is_delayed", "boolean", expr="actual_delivery > expected_delivery") \
+     .withColumn("delay_days", "integer", expr="datediff(actual_delivery, expected_delivery)") \
+     .withColumn("carrier", "string", values=["FedEx", "UPS", "DHL", "USPS"], weights=[0.4, 0.3, 0.2, 0.1])
+    
+    shipments_df = shipments_df.build()
+    
+    return {
+        "suppliers": suppliers_df,
+        "products": products_df,
+        "shipments": shipments_df
+    }
+
+def generate_finance_data(spark, data_scale="medium"):
+    """Generate finance industry synthetic data"""
+    
+    scale_map = {"small": 2000, "medium": 25000, "large": 100000}
+    base_rows = scale_map.get(data_scale, 25000)
+    
+    print(f"🎯 Generating finance data with {data_scale} scale ({base_rows} base rows)")
+    
+    # Generate Customers
+    print("👥 Generating customers...")
+    customers_df = dg.DataGenerator(
+        spark,
+        rows=base_rows // 2,
+        partitions=4
+    ).withIdOutput() \
+     .withColumn("customer_id", "string", uniqueValues=True) \
+     .withColumn("first_name", "string", template=r'\\w{3,8}') \
+     .withColumn("last_name", "string", template=r'\\w{4,10}') \
+     .withColumn("email", "string", template=r'\\w{5,10}@\\w{3,8}\\.com') \
+     .withColumn("phone", "string", template=r'\\d{3}-\\d{3}-\\d{4}') \
+     .withColumn("date_of_birth", "date", begin="1960-01-01", end="2005-12-31") \
+     .withColumn("income", "decimal(10,2)", minValue=20000, maxValue=500000, distribution="lognormal") \
+     .withColumn("credit_score", "integer", minValue=300, maxValue=850, distribution="normal") \
+     .withColumn("risk_level", "string", values=["low", "medium", "high"], weights=[0.6, 0.3, 0.1]) \
+     .withColumn("created_date", "timestamp", begin="2015-01-01", end="2024-01-01")
+    
+    customers_df = customers_df.build()
+    customer_ids = [row.customer_id for row in customers_df.select("customer_id").collect()]
+    
+    # Generate Accounts
+    print("🏦 Generating accounts...")
+    accounts_df = dg.DataGenerator(
+        spark,
+        rows=base_rows,
+        partitions=6
+    ).withIdOutput() \
+     .withColumn("account_id", "string", uniqueValues=True) \
+     .withColumn("customer_id", "string", values=customer_ids) \
+     .withColumn("account_type", "string", values=["checking", "savings", "credit", "investment"], weights=[0.5, 0.3, 0.15, 0.05]) \
+     .withColumn("balance", "decimal(12,2)", minValue=0, maxValue=100000, distribution="lognormal") \
+     .withColumn("credit_limit", "decimal(12,2)", minValue=0, maxValue=50000, distribution="lognormal") \
+     .withColumn("interest_rate", "decimal(5,4)", minValue=0.01, maxValue=0.25, distribution="normal") \
+     .withColumn("risk_score", "integer", minValue=300, maxValue=850, distribution="normal") \
+     .withColumn("account_status", "string", values=["active", "suspended", "closed"], weights=[0.95, 0.03, 0.02]) \
+     .withColumn("opened_date", "timestamp", begin="2015-01-01", end="2024-01-01") \
+     .withColumn("last_activity", "timestamp", begin="2023-01-01", end="2024-01-01")
+    
+    accounts_df = accounts_df.build()
+    account_ids = [row.account_id for row in accounts_df.select("account_id").collect()]
+    
+    # Generate Transactions
+    print("💳 Generating transactions...")
+    transactions_df = dg.DataGenerator(
+        spark,
+        rows=base_rows * 4,
+        partitions=10
+    ).withIdOutput() \
+     .withColumn("transaction_id", "string", uniqueValues=True) \
+     .withColumn("account_id", "string", values=account_ids) \
+     .withColumn("transaction_date", "timestamp", begin="2023-01-01", end="2024-01-01", distribution="normal") \
+     .withColumn("amount", "decimal(12,2)", minValue=1, maxValue=10000, distribution="lognormal") \
+     .withColumn("transaction_type", "string", values=["deposit", "withdrawal", "transfer", "payment", "fee"], weights=[0.3, 0.25, 0.2, 0.2, 0.05]) \
+     .withColumn("merchant_category", "string", values=["retail", "restaurant", "gas", "online", "utilities", "entertainment"], weights=[0.3, 0.2, 0.15, 0.2, 0.1, 0.05]) \
+     .withColumn("merchant_name", "string", template=r'\\w{4,12} \\w{3,8}') \
+     .withColumn("location", "string", template=r'\\w{4,8}, \\w{2}') \
+     .withColumn("is_fraud", "boolean", values=[False, True], weights=[0.99, 0.01]) \
+     .withColumn("fraud_score", "decimal(3,2)", minValue=0.0, maxValue=1.0, distribution="normal") \
+     .withColumn("is_approved", "boolean", values=[True, False], weights=[0.98, 0.02])
+    
+    transactions_df = transactions_df.build()
+    
+    return {
+        "customers": customers_df,
+        "accounts": accounts_df,
+        "transactions": transactions_df
+    }
+
+def write_to_databricks(spark, dataframes, industry):
+    """Write dataframes to Databricks Unity Catalog"""
+    
+    catalog = f"dev_{industry}_demo"
+    schema = "{{.project_name}}"
+    
+    print(f"💾 Writing data to Unity Catalog: {catalog}.{schema}")
+    
+    # Create catalog and schema if they don't exist
+    spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog}")
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
+    
+    # Write each dataframe
+    for table_name, df in dataframes.items():
+        print(f"📝 Writing {table_name} table...")
+        df.write \
+            .format("delta") \
+            .mode("overwrite") \
+            .saveAsTable(f"{catalog}.{schema}.{table_name}")
+        
+        # Show sample data
+        print(f"✅ {table_name} table created with {df.count()} rows")
+        df.show(5, truncate=False)
+
+def main():
+    """Main data generation function"""
+    
+    # Get parameters from environment or use defaults
+    industry = os.getenv("INDUSTRY", "retail")
+    data_scale = os.getenv("DATA_SCALE", "medium")
+    
+    print(f"🚀 Starting data generation for {industry} industry")
+    print(f"📊 Data scale: {data_scale}")
+    
+    # Create Spark session
+    spark = create_spark_session()
+    
+    try:
+        # Generate data based on industry
+        if industry == "retail":
+            dataframes = generate_retail_data(spark, data_scale)
+        elif industry == "supply_chain":
+            dataframes = generate_supply_chain_data(spark, data_scale)
+        elif industry == "finance":
+            dataframes = generate_finance_data(spark, data_scale)
+        else:
+            print(f"❌ Unsupported industry: {industry}")
+            sys.exit(1)
+        
+        # Write to Databricks
+        write_to_databricks(spark, dataframes, industry)
+        
+        print("✅ Data generation completed successfully!")
+        
+    except Exception as e:
+        print(f"❌ Error during data generation: {str(e)}")
+        sys.exit(1)
+    
+    finally:
+        spark.stop()
+
+if __name__ == "__main__":
+    main() 

@@ -1,0 +1,77 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./public/**/*.html",
+    "./components/**/*.{js,jsx}",
+    "./lib/**/*.{js,jsx}"
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // Databricks Brand Colors
+        'databricks-red': '#FF3621',
+        'databricks-dark': '#1B3139',
+        'databricks-green': '#00A972',
+        'databricks-orange': '#FFA500',
+        'databricks-blue': '#0073E6',
+        
+        // Extended palette for charts
+        'chart-1': '#FF3621',
+        'chart-2': '#00A972', 
+        'chart-3': '#0073E6',
+        'chart-4': '#FFA500',
+        'chart-5': '#8B5CF6',
+        'chart-6': '#06B6D4',
+        
+        // UI Colors
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: '#FF3621',
+          foreground: '#FFFFFF',
+        },
+        secondary: {
+          DEFAULT: '#1B3139',
+          foreground: '#FFFFFF',
+        },
+        muted: {
+          DEFAULT: '#F8F9FA',
+          foreground: '#6C757D',
+        },
+        accent: {
+          DEFAULT: '#00A972',
+          foreground: '#FFFFFF',
+        },
+        border: '#E9ECEF',
+        input: '#FFFFFF',
+        ring: '#FF3621',
+        destructive: {
+          DEFAULT: '#DC3545',
+          foreground: '#FFFFFF',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'display-1': ['3.5rem', { lineHeight: '1.2', fontWeight: '700' }],
+        'display-2': ['3rem', { lineHeight: '1.2', fontWeight: '700' }],
+        'h1': ['2.5rem', { lineHeight: '1.3', fontWeight: '600' }],
+        'h2': ['2rem', { lineHeight: '1.3', fontWeight: '600' }],
+        'h3': ['1.5rem', { lineHeight: '1.4', fontWeight: '600' }],
+        'body-lg': ['1.125rem', { lineHeight: '1.6', fontWeight: '400' }],
+        'body': ['1rem', { lineHeight: '1.6', fontWeight: '400' }],
+        'body-sm': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
+        'caption': ['0.75rem', { lineHeight: '1.4', fontWeight: '500' }],
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+      },
+      borderRadius: {
+        'databricks': '8px',
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} 

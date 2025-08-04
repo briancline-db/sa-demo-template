@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "default": "my_demo",
+      "description": "Project name (use underscores, e.g., retail_analytics, supply_chain_ops)",
+      "order": 1
+    },
+    "demo_description": {
+      "type": "string",
+      "description": "Detailed description of your demo (be as specific as possible - this helps Cursor AI build your demo). Example: 'A retail analytics dashboard showing customer segmentation, sales trends, and inventory management. Include real-time transaction processing, customer lifetime value analysis, and predictive analytics for demand forecasting. Use modern charts and KPIs.'",
+      "order": 2
+    },
+    "industry": {
+      "type": "string",
+      "default": "retail",
+      "description": "Industry focus: retail, supply_chain, finance, healthcare, manufacturing, telecom",
+      "order": 3
+    },
+    "complexity": {
+      "type": "string", 
+      "default": "standard",
+      "description": "Demo complexity: simple (dashboards), standard (dashboards + OLTP), advanced (dashboards + OLTP + LLM agents)",
+      "order": 4
+    },
+    "workspace_host": {
+      "type": "string",
+      "description": "Databricks workspace URL",
+      "order": 5
+    },
+    "warehouse_id": {
+      "type": "string",
+      "description": "SQL Warehouse ID",
+      "order": 6
+    },
+    "data_scale": {
+      "type": "string",
+      "default": "medium",
+      "description": "Data volume: small (1K records), medium (10K), large (100K)",
+      "order": 7
+    }
+  }
+} 

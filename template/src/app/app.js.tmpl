@@ -1,0 +1,175 @@
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(helmet());
+app.use(compression());
+app.use(cors());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    service: '{{.project_name}}-dashboard'
+  });
+});
+
+// KPI endpoints
+app.get('/api/kpis', async (req, res) => {
+  try {
+    // TODO: Replace with actual Databricks data queries
+    const kpis = {
+      total_revenue: { value: '$2.4M', trend: { direction: 'up', value: '+12%' } },
+      total_customers: { value: '15,234', trend: { direction: 'up', value: '+8%' } },
+      avg_order_value: { value: '$156', trend: { direction: 'up', value: '+5%' } },
+      conversion_rate: { value: '3.2%', trend: { direction: 'down', value: '-2%' } }
+    };
+    
+    res.json(kpis);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch KPIs' });
+  }
+});
+
+// Chart data endpoints
+app.get('/api/trends', async (req, res) => {
+  try {
+    // TODO: Replace with actual Databricks data queries
+    const trends = [
+      { month: 'Jan', revenue: 1200000, customers: 12000 },
+      { month: 'Feb', revenue: 1350000, customers: 12500 },
+      { month: 'Mar', revenue: 1420000, customers: 13100 },
+      { month: 'Apr', revenue: 1580000, customers: 13800 },
+      { month: 'May', revenue: 1650000, customers: 14200 },
+      { month: 'Jun', revenue: 1720000, customers: 14800 },
+      { month: 'Jul', revenue: 1890000, customers: 15200 },
+      { month: 'Aug', revenue: 2010000, customers: 15800 },
+      { month: 'Sep', revenue: 2180000, customers: 16200 },
+      { month: 'Oct', revenue: 2250000, customers: 16800 },
+      { month: 'Nov', revenue: 2380000, customers: 17500 },
+      { month: 'Dec', revenue: 2400000, customers: 18200 }
+    ];
+    
+    res.json(trends);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch trends' });
+  }
+});
+
+app.get('/api/segments', async (req, res) => {
+  try {
+    // TODO: Replace with actual Databricks data queries
+    const segments = [
+      { segment: 'Bronze', customers: 8500, revenue: 850000 },
+      { segment: 'Silver', customers: 5200, revenue: 1040000 },
+      { segment: 'Gold', customers: 1200, revenue: 480000 },
+      { segment: 'Platinum', customers: 334, revenue: 267000 }
+    ];
+    
+    res.json(segments);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch segments' });
+  }
+});
+
+{{#if (gte .complexity "standard")}}
+// OLTP endpoints for real-time data
+app.post('/api/transactions', async (req, res) => {
+  try {
+    // TODO: Implement Lakebase OLTP integration
+    const transaction = {
+      id: Date.now().toString(),
+      ...req.body,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Broadcast real-time update
+    // TODO: Implement WebSocket or Server-Sent Events
+    
+    res.json(transaction);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create transaction' });
+  }
+});
+
+app.get('/api/transactions/recent', async (req, res) => {
+  try {
+    // TODO: Replace with actual OLTP queries
+    const recentTransactions = [
+      { id: '1', customer: 'John Doe', amount: 156.78, product: 'Product A', timestamp: new Date().toISOString() },
+      { id: '2', customer: 'Jane Smith', amount: 89.99, product: 'Product B', timestamp: new Date(Date.now() - 300000).toISOString() },
+      { id: '3', customer: 'Bob Johnson', amount: 234.50, product: 'Product C', timestamp: new Date(Date.now() - 600000).toISOString() }
+    ];
+    
+    res.json(recentTransactions);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch recent transactions' });
+  }
+});
+{{/if}}
+
+{{#if (eq .complexity "advanced")}}
+// LLM Agent endpoints
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { message } = req.body;
+    
+    // TODO: Implement Mosaic AI Agent Framework integration
+    const response = {
+      content: `I understand you're asking about "${message}". Let me analyze the data and provide insights...`,
+      confidence: 0.85,
+      sources: ['sales_data', 'customer_segments', 'inventory_levels']
+    };
+    
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({ error: 'Chat service unavailable' });
+  }
+});
+
+app.get('/api/insights', async (req, res) => {
+  try {
+    // TODO: Replace with actual ML model predictions
+    const insights = [
+      { type: 'anomaly', message: 'Unusual spike in electronics sales', confidence: 0.92 },
+      { type: 'trend', message: 'Growing demand for premium products', confidence: 0.87 },
+      { type: 'recommendation', message: 'Consider increasing inventory for Category A', confidence: 0.78 }
+    ];
+    
+    res.json(insights);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch insights' });
+  }
+});
+{{/if}}
+
+// Serve the main dashboard
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 {{.project_name}} Dashboard running on port ${PORT}`);
+  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🎯 Dashboard: http://localhost:${PORT}`);
+}); 

@@ -1,0 +1,36 @@
+bundle:
+  name: {{.project_name}}
+
+targets:
+  dev:
+    default: true
+    workspace:
+      host: {{.workspace_host}}
+    resources:
+      jobs:
+        {{.project_name}}_job:
+          name: {{.project_name}}_job
+          tasks:
+            - task_key: generate_data
+              notebook_task:
+                notebook_path: ./src/{{.project_name}}/main
+                source: WORKSPACE
+              job_cluster_key: job_cluster
+          job_clusters:
+            - job_cluster_key: job_cluster
+              new_cluster:
+                spark_version: 14.0.x-scala2.12
+                node_type_id: Standard_DS3_v2
+                num_workers: 1
+                spark_conf:
+                  spark.databricks.delta.preview.enabled: true
+      apps:
+        {{.project_name}}_app:
+          name: {{.project_name}}_app
+          type: web
+          source: ./src/app
+          build_commands:
+            - npm install
+            - npm run build
+          run_commands:
+            - npm start 

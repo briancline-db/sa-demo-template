@@ -1,0 +1,90 @@
+import React from 'react';
+import {
+  LineChart, Line, AreaChart, Area, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
+
+const DATABRICKS_COLORS = ['#FF3621', '#00A972', '#0073E6', '#FFA500', '#8B5CF6', '#06B6D4'];
+
+export function DatabricksChart({ 
+  type = 'line',
+  data = [],
+  xKey,
+  yKeys = [],
+  title,
+  className = "",
+  height = 400,
+  ...props 
+}) {
+  const ChartComponent = {
+    line: LineChart,
+    area: AreaChart,
+    bar: BarChart
+  }[type];
+
+  const DataComponent = {
+    line: Line,
+    area: Area,
+    bar: Bar
+  }[type];
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-200 rounded-databricks shadow-lg">
+          <p className="text-body-sm font-medium text-databricks-dark">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-body-sm" style={{ color: entry.color }}>
+              {`${entry.name}: ${entry.value.toLocaleString()}`}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className={`bg-white rounded-databricks p-6 shadow-lg ${className}`}>
+      {title && (
+        <h3 className="text-h3 font-semibold text-databricks-dark mb-4">{title}</h3>
+      )}
+      <ResponsiveContainer width="100%" height={height}>
+        <ChartComponent data={data} {...props}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#E9ECEF" />
+          <XAxis 
+            dataKey={xKey} 
+            stroke="#6C757D"
+            fontSize={12}
+            fontFamily="Inter"
+          />
+          <YAxis 
+            stroke="#6C757D"
+            fontSize={12}
+            fontFamily="Inter"
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+          {yKeys.map((key, index) => {
+            const color = DATABRICKS_COLORS[index % DATABRICKS_COLORS.length];
+            const commonProps = {
+              key,
+              dataKey: key,
+              stroke: color,
+              strokeWidth: 2,
+              name: key.charAt(0).toUpperCase() + key.slice(1)
+            };
+
+            if (type === 'area') {
+              return <Area {...commonProps} fill={color} fillOpacity={0.1} />;
+            } else if (type === 'bar') {
+              return <Bar {...commonProps} fill={color} />;
+            } else {
+              return <Line {...commonProps} dot={{ fill: color, strokeWidth: 2 }} />;
+            }
+          })}
+        </ChartComponent>
+      </ResponsiveContainer>
+    </div>
+  );
+} 

@@ -1,0 +1,42 @@
+import React from 'react';
+
+export function DatabricksCard({ 
+  title, 
+  description, 
+  value, 
+  trend, 
+  icon: Icon,
+  className = "",
+  ...props 
+}) {
+  return (
+    <div className={`bg-white rounded-databricks shadow-lg border-0 p-6 ${className}`} {...props}>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-body font-medium text-gray-600">
+          {title}
+        </h3>
+        {Icon && (
+          <div className="h-8 w-8 bg-databricks-red rounded-databricks flex items-center justify-center">
+            <Icon className="h-4 w-4 text-white" />
+          </div>
+        )}
+      </div>
+      <div className="text-h2 font-bold text-databricks-dark mb-2">{value}</div>
+      {description && (
+        <p className="text-body-sm text-gray-500 mb-2">
+          {description}
+        </p>
+      )}
+      {trend && (
+        <div className={`text-body-sm flex items-center ${
+          trend.direction === 'up' ? 'text-databricks-green' : 
+          trend.direction === 'down' ? 'text-red-500' : 'text-gray-500'
+        }`}>
+          {trend.direction === 'up' && '↗ '}
+          {trend.direction === 'down' && '↘ '}
+          {trend.value}
+        </div>
+      )}
+    </div>
+  );
+} 
