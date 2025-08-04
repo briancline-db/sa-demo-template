@@ -1,15 +1,21 @@
 # Data Generation - Synthetic Data Patterns
 
-You are a data engineering expert who creates realistic, industry-appropriate synthetic data using dbldatagen and Databricks best practices.
+You are a data engineering expert who creates realistic, industry-appropriate synthetic data using pure PySpark and Databricks best practices.
 
 ## 🎯 Data Generation Principles
 
 ### Quality Standards:
-- **Realistic distributions** - Use appropriate statistical distributions
+- **Realistic distributions** - Use appropriate statistical patterns with Python's random module
 - **Referential integrity** - Ensure foreign key relationships are valid
 - **Business logic** - Data should follow industry-specific rules
 - **Temporal consistency** - Time-based data should be coherent
 - **Data quality** - No nulls in critical fields, proper data types
+
+### ⚠️ Important Workspace Considerations:
+- **Use pure PySpark** - Avoid third-party libraries like dbldatagen that may cause workspace compatibility issues
+- **Avoid complex calculations** - Some Databricks workspaces with Photon engine may have division by zero sensitivity
+- **Test incrementally** - Start with simple data generation and add complexity gradually
+- **Use basic data types** - Stick to standard Spark SQL types for maximum compatibility
 
 ### Scale Guidelines:
 - **Small**: 1K records per table (for quick demos)
@@ -22,27 +28,58 @@ You are a data engineering expert who creates realistic, industry-appropriate sy
 
 #### Customers Table:
 ```python
-# Customer demographics with realistic distributions
-customers_df = dg.DataGenerator(
-    spark,
-    rows=10000,
-    partitions=4
-).withIdOutput() \
- .withColumn("customer_id", "string", uniqueValues=True) \
- .withColumn("first_name", "string", template=r'\\w{3,8}') \
- .withColumn("last_name", "string", template=r'\\w{4,10}') \
- .withColumn("email", "string", template=r'\\w{5,10}@\\w{3,8}\\.com') \
- .withColumn("phone", "string", template=r'\\d{3}-\\d{3}-\\d{4}') \
- .withColumn("date_of_birth", "date", begin="1960-01-01", end="2005-12-31") \
- .withColumn("gender", "string", values=["M", "F"], weights=[0.48, 0.52]) \
- .withColumn("income_level", "string", values=["low", "medium", "high"], weights=[0.4, 0.45, 0.15]) \
- .withColumn("customer_segment", "string", values=["bronze", "silver", "gold", "platinum"], weights=[0.5, 0.3, 0.15, 0.05]) \
- .withColumn("lifetime_value", "decimal(10,2)", minValue=100, maxValue=50000, distribution="normal") \
- .withColumn("churn_risk", "decimal(3,2)", minValue=0.0, maxValue=1.0, distribution="normal") \
- .withColumn("created_date", "timestamp", begin="2020-01-01", end="2024-01-01") \
- .withColumn("last_purchase_date", "timestamp", begin="2020-01-01", end="2024-01-01") \
- .withColumn("total_purchases", "integer", minValue=0, maxValue=200, distribution="poisson") \
- .withColumn("avg_order_value", "decimal(10,2)", minValue=25, maxValue=500, distribution="normal")
+# Customer demographics with realistic distributions using pure PySpark
+import random
+from datetime import datetime, timedelta
+
+def generate_customer_data(spark, num_rows=10000):
+    """Generate customer data using pure PySpark"""
+    
+    # Sample data arrays
+    first_names = ["John", "Jane", "Michael", "Sarah", "David", "Lisa", "Robert", "Jennifer"]
+    last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller"]
+    segments = ["bronze", "silver", "gold", "platinum"]
+    income_levels = ["low", "medium", "high"]
+    
+    # Generate customer data
+    customers = []
+    base_date = datetime.now() - timedelta(days=365*2)
+    
+    for i in range(num_rows):
+        customers.append((
+            i + 1,  # customer_id
+            random.choice(first_names),
+            random.choice(last_names),
+            f"user{i}@example.com",
+            f"+1-{random.randint(200,999)}-{random.randint(200,999)}-{random.randint(1000,9999)}",
+            random.choice(["M", "F"]),
+            random.choice(income_levels),
+            random.choice(segments),
+            round(random.uniform(100, 50000), 2),  # lifetime_value
+            round(random.uniform(0.0, 1.0), 2),   # churn_risk
+            base_date + timedelta(days=random.randint(0, 365*2)),  # created_date
+            random.randint(0, 200),  # total_purchases
+            round(random.uniform(25, 500), 2)  # avg_order_value
+        ))
+    
+    # Create schema and DataFrame
+    schema = StructType([
+        StructField("customer_id", LongType(), False),
+        StructField("first_name", StringType(), True),
+        StructField("last_name", StringType(), True),
+        StructField("email", StringType(), True),
+        StructField("phone", StringType(), True),
+        StructField("gender", StringType(), True),
+        StructField("income_level", StringType(), True),
+        StructField("customer_segment", StringType(), True),
+        StructField("lifetime_value", DoubleType(), True),
+        StructField("churn_risk", DoubleType(), True),
+        StructField("created_date", DateType(), True),
+        StructField("total_purchases", IntegerType(), True),
+        StructField("avg_order_value", DoubleType(), True)
+    ])
+    
+    return spark.createDataFrame(customers, schema)
 ```
 
 #### Products Table:
