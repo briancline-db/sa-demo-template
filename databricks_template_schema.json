@@ -33,11 +33,23 @@
       "description": "SQL Warehouse ID",
       "order": 6
     },
+    "catalog_name": {
+      "type": "string",
+      "default": "main",
+      "description": "Unity Catalog name (will be created if it doesn't exist)",
+      "order": 7
+    },
+    "schema_name": {
+      "type": "string",
+      "default": "{{.project_name}}_demo",
+      "description": "Schema name (will be created if it doesn't exist)",
+      "order": 8
+    },
     "data_scale": {
       "type": "string",
       "default": "medium",
       "description": "Data volume: small (1K records), medium (10K), large (100K)",
-      "order": 7
+      "order": 9
     }
   }
 } 

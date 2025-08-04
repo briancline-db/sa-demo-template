@@ -71,7 +71,7 @@ def generate_retail_data(spark, data_scale="medium"):
      .withColumn("subcategory", "string", template=r'Sub-\\w{4,8}') \
      .withColumn("brand", "string", values=["BrandA", "BrandB", "BrandC", "BrandD", "BrandE"], weights=[0.3, 0.25, 0.2, 0.15, 0.1]) \
      .withColumn("price", "decimal(10,2)", minValue=10, maxValue=1000) \
-     .withColumn("cost", "decimal(10,2)", expr="price * (0.4 + rand() * 0.3)") \
+     .withColumn("cost", "decimal(10,2)", expr="CASE WHEN price > 0 THEN price * (0.4 + rand() * 0.3) ELSE 1.0 END") \
      .withColumn("inventory_level", "integer", minValue=0, maxValue=500) \
      .withColumn("reorder_point", "integer", minValue=10, maxValue=100) \
      .withColumn("supplier_id", "string", template=r'SUP\\d{4}') \
@@ -94,7 +94,7 @@ def generate_retail_data(spark, data_scale="medium"):
      .withColumn("transaction_date", "timestamp", begin="2023-01-01 00:00:00", end="2024-01-01 23:59:59") \
      .withColumn("quantity", "integer", minValue=1, maxValue=10) \
      .withColumn("unit_price", "decimal(10,2)", minValue=10, maxValue=500) \
-     .withColumn("total_amount", "decimal(10,2)", expr="quantity * unit_price") \
+     .withColumn("total_amount", "decimal(10,2)", expr="CASE WHEN quantity > 0 AND unit_price > 0 THEN quantity * unit_price ELSE 0.0 END") \
      .withColumn("payment_method", "string", values=["credit_card", "debit_card", "cash", "paypal"], weights=[0.6, 0.25, 0.1, 0.05]) \
      .withColumn("store_id", "string", template=r'STORE\\d{3}') \
      .withColumn("sales_person_id", "string", template=r'SP\\d{4}') \
@@ -266,17 +266,20 @@ def generate_finance_data(spark, data_scale="medium"):
         "transactions": transactions_df
     }
 
-def write_to_databricks(spark, dataframes, industry):
+def write_to_databricks(spark, dataframes, catalog, schema):
     """Write dataframes to Databricks Unity Catalog"""
-    
-    catalog = f"dev_{industry}_demo"
-    schema = "{{.project_name}}"
     
     print(f"💾 Writing data to Unity Catalog: {catalog}.{schema}")
     
     # Create catalog and schema if they don't exist
-    spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog}")
-    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
+    try:
+        print(f"🔧 Creating catalog '{catalog}' if it doesn't exist...")
+        spark.sql(f"CREATE CATALOG IF NOT EXISTS {catalog}")
+        print(f"🔧 Creating schema '{schema}' if it doesn't exist...")
+        spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog}.{schema}")
+    except Exception as e:
+        print(f"⚠️  Warning: Could not create catalog/schema: {str(e)}")
+        print("Proceeding with existing catalog/schema...")
     
     # Write each dataframe
     for table_name, df in dataframes.items():
@@ -294,8 +297,10 @@ def main():
     """Main data generation function"""
     
     # Get parameters from environment or use defaults
-    industry = os.getenv("INDUSTRY", "retail")
-    data_scale = os.getenv("DATA_SCALE", "medium")
+    industry = os.getenv("INDUSTRY", "{{.industry}}")
+    data_scale = os.getenv("DATA_SCALE", "{{.data_scale}}")
+    catalog = os.getenv("CATALOG_NAME", "{{.catalog_name}}")
+    schema = os.getenv("SCHEMA_NAME", "{{.schema_name}}")
     
     print(f"🚀 Starting data generation for {industry} industry")
     print(f"📊 Data scale: {data_scale}")
@@ -316,7 +321,7 @@ def main():
             sys.exit(1)
         
         # Write to Databricks
-        write_to_databricks(spark, dataframes, industry)
+        write_to_databricks(spark, dataframes, catalog, schema)
         
         print("✅ Data generation completed successfully!")
         
