@@ -13,7 +13,7 @@ targets:
           tasks:
             - task_key: generate_data
               notebook_task:
-                notebook_path: ./src/project_name/main
+                notebook_path: ./src/project_name/main.py
                 source: WORKSPACE
               job_cluster_key: job_cluster
           job_clusters:
@@ -24,13 +24,4 @@ targets:
                 num_workers: 1
                 spark_conf:
                   spark.databricks.delta.preview.enabled: true
-      apps:
-        {{.project_name}}_app:
-          name: {{.project_name}}_app
-          type: web
-          source: ./src/app
-          build_commands:
-            - npm install
-            - npm run build
-          run_commands:
-            - npm start 
+ 
