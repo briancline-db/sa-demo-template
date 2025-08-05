@@ -87,7 +87,7 @@ npm run build
 <DatabricksCard
   title="Total Revenue"
   value="$2.4M"
-  trend={{ direction: 'up', value: '+12%' }}
+  trend={ { direction: 'up', value: '+12%' } }
   icon={DollarSignIcon}
 />
 

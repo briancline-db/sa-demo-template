@@ -51,11 +51,11 @@ export function DatabricksChart({
                   <div className="flex items-center space-x-2">
                     <div 
                       className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: entry.color }}
+                      style={ { backgroundColor: entry.color } }
                     />
                     <span className="text-sm text-muted-foreground">{entry.name}</span>
                   </div>
-                  <span className="text-sm font-medium" style={{ color: entry.color }}>
+                  <span className="text-sm font-medium" style={ { color: entry.color } }>
                     {entry.value.toLocaleString()}
                   </span>
                 </div>
@@ -90,7 +90,7 @@ export function DatabricksChart({
         height={height}
         minHeight={200}
       >
-        <ChartComponent data={data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }} {...props}>
+        <ChartComponent data={data} margin={ { top: 5, right: 10, left: 10, bottom: 5 } } {...props}>
             {showGrid && (
               <CartesianGrid 
                 strokeDasharray="3 3" 
@@ -138,7 +138,7 @@ export function DatabricksChart({
               } else if (type === 'bar') {
                 return <Bar {...commonProps} fill={color} radius={[4, 4, 0, 0]} />
               } else {
-                return <Line {...commonProps} dot={{ fill: color, strokeWidth: 2, r: 4 }} />
+                return <Line {...commonProps} dot={ { fill: color, strokeWidth: 2, r: 4 } } />
               }
             })}
           </ChartComponent>

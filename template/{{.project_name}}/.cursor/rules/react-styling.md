@@ -116,7 +116,7 @@ font-family: 'Inter', system-ui, sans-serif;
 <DatabricksCard
   title="Total Revenue"
   value="$2.4M"
-  trend={{ direction: 'up', value: '+12%' }}
+      trend={ { direction: 'up', value: '+12%' } }
   icon={DollarSignIcon}
   className="bg-white shadow-lg border-0"
 />

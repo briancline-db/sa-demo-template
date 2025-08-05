@@ -175,7 +175,7 @@ function App() {
           title="Data Quality Score"
           value="98.5%"
           description="Real-time data accuracy and completeness"
-          trend={{ direction: 'up', value: '+0.3%' }}
+                      trend={ { direction: 'up', value: '+0.3%' } }
           icon={Activity}
           className="min-h-[200px] sm:min-h-[240px]"
         />
