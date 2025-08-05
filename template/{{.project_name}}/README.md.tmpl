@@ -285,13 +285,40 @@ npm run dev
 ```
 
 ### **Databricks Deployment**
+
+#### **🎯 Standard Deployment Workflow**
 ```bash
-# Deploy to Databricks
+# 1. Deploy the bundle (creates compute resources and uploads code)
 databricks bundle deploy
 
-# Run data generation job
-databricks jobs submit --job-id <job-id>
+# 2. Run the data generation job 
+databricks bundle run {{.project_name}}_job
+
+# 3. Start the Databricks App (dashboard)
+databricks bundle run {{.project_name}}_app
+
+# 4. Check app status
+databricks apps list
 ```
+
+#### **🔍 Troubleshooting**
+```bash
+# If deployment fails, check:
+databricks bundle summary
+databricks apps list
+
+# Compare with working apps
+databricks apps get working-app-name
+
+# Verify no app.yaml exists (should NOT exist for standard Node.js apps)
+ls src/app/app.yaml  # Should return "No such file"
+```
+
+#### **✅ Success Indicators**
+- Bundle deploys without errors
+- Data generation job completes successfully  
+- App shows "RUNNING" status in `databricks apps list`
+- Dashboard is accessible via the provided URL
 
 ### **Production Deployment**
 ```bash

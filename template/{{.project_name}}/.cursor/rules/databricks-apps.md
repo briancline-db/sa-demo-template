@@ -40,6 +40,36 @@ src/app/
 
 ## 🚀 Development Workflow
 
+### **🚨 CRITICAL: Databricks Apps Deployment Rules**
+
+#### **❌ NEVER Create app.yaml for Standard Node.js Apps**
+- **Problem**: Custom `app.yaml` files force npm commands that often fail during installation
+- **Solution**: Let Databricks auto-detect Node.js behavior (works much better)
+- **Rule**: Only include `app.yaml` for non-standard deployment requirements
+
+#### **✅ Correct databricks.yml Configuration:**
+```yaml
+resources:
+  apps:
+    your_app_name:
+      name: your-app-dashboard  
+      description: "Your Analytics Dashboard"
+      source_code_path: ./src/app
+      # No config section needed - Databricks handles it automatically
+```
+
+#### **🔧 Standard Deployment Workflow:**
+```bash
+# 1. Deploy the bundle (creates compute resources)
+databricks bundle deploy
+
+# 2. Run the app (deploys and starts the application code)  
+databricks bundle run your_app_name
+
+# 3. Check status
+databricks apps list
+```
+
 ### Local Development:
 ```bash
 # Install dependencies
@@ -255,3 +285,30 @@ dist/
 7. **Test production build locally** before deploying
 
 This architecture ensures scalable, maintainable, and performant Databricks Apps that integrate seamlessly with the Databricks platform while providing excellent user experience.
+
+## 🔍 **Troubleshooting Deployment Issues**
+
+### **If App Deployment Fails:**
+```bash
+# 1. Check current status
+databricks apps list
+
+# 2. Check deployment history
+databricks apps list-deployments your-app-name
+
+# 3. Compare with working apps in same workspace
+databricks apps get working-app-name
+databricks apps get failing-app-name
+
+# 4. Verify no app.yaml exists (should NOT exist for standard apps)
+ls src/app/app.yaml  # Should return "No such file"
+```
+
+### **Key Debugging Checklist:**
+1. ❌ **Does the app have an `app.yaml` file?** → Remove it for standard Node.js apps
+2. ✅ **Is the `databricks.yml` configured with apps section?** → Check template
+3. ✅ **Are you running `deploy` before `run`?** → Always deploy first
+4. ✅ **Does a similar working app exist to compare with?** → Use as reference
+
+### **Success Factor:**
+**For standard Node.js/React applications, Databricks auto-detection works better than manual configuration.** Only use custom `app.yaml` when you have specific non-standard requirements.

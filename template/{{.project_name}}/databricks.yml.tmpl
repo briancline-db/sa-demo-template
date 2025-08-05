@@ -20,4 +20,9 @@ targets:
               spec:
                 client: '1'
                 dependencies: []
+      apps:
+        {{.project_name}}_app:
+          name: {{.project_name}}-dashboard
+          description: "{{.project_name}} Analytics Dashboard"
+          source_code_path: ./src/app
  
