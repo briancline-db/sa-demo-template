@@ -4,6 +4,8 @@ import { DatabricksCard } from './components/DatabricksCard'
 import { DatabricksChart } from './components/DatabricksChart'
 import { ResponsiveLayout } from './components/layout/ResponsiveLayout'
 import { ChatPage } from './pages/ChatPage'
+import { CustomerSegmentationPage } from './pages/CustomerSegmentationPage'
+import { DemandForecastingPage } from './pages/DemandForecastingPage'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('overview')
@@ -185,6 +187,8 @@ function App() {
     switch (currentPage) {
       case 'chat':
         return <ChatPage />
+      case 'demand-forecasting':
+        return <DemandForecastingPage />
       case 'analytics':
         return (
           <div className="text-center py-12">
@@ -193,12 +197,7 @@ function App() {
           </div>
         )
       case 'customers':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Customers Page</h2>
-            <p className="text-gray-600">Customer management interface coming soon...</p>
-          </div>
-        )
+        return <CustomerSegmentationPage />
       case 'revenue':
         return (
           <div className="text-center py-12">

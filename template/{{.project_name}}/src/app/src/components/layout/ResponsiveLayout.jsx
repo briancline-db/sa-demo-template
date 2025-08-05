@@ -32,62 +32,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DatabricksLogo } from '../DatabricksLogo'
 
-const navigation = [
-  {
-    name: 'Overview',
-    href: 'overview',
-    icon: BarChart3,
-    current: true,
-    badge: null
-  },
-  {
-    name: 'Analytics',
-    href: 'analytics', 
-    icon: LineChart,
-    current: false,
-    badge: null
-  },
-  {
-    name: 'Chat',
-    href: 'chat',
-    icon: Activity,
-    current: false,
-    badge: '2'
-  },
-  {
-    name: 'Customers',
-    href: 'customers',
-    icon: Users,
-    current: false,
-    badge: '15.2K'
-  },
-  {
-    name: 'Revenue',
-    href: 'revenue',
-    icon: DollarSign,
-    current: false,
-    badge: null
-  },
-  {
-    name: 'Performance',
-    href: 'performance',
-    icon: Target,
-    current: false,
-    badge: null
-  },
-  {
-    name: 'Reports',
-    href: 'reports',
-    icon: PieChart,
-    current: false,
-    badge: '3'
-  }
-]
-
-const secondaryNavigation = [
-  { name: 'Data Sources', href: 'data-sources', icon: Database },
-  { name: 'Settings', href: 'settings', icon: Settings }
-]
+// Import centralized navigation configuration
+import { 
+  primaryNavigation, 
+  secondaryNavigation,
+  isNavigationItemActive 
+} from '../../config/navigation'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -126,15 +76,15 @@ export function ResponsiveLayout({ children, onRefreshData, currentPage, onNavig
                   <ul className="flex flex-1 flex-col gap-y-7">
                     <li>
                       <ul className="-mx-2 space-y-1">
-                        {navigation.map((item) => (
-                          <li key={item.name}>
+                        {primaryNavigation.map((item) => (
+                          <li key={item.id}>
                             <button
                               onClick={() => {
                                 onNavigate(item.href)
                                 setSidebarOpen(false)
                               }}
                               className={classNames(
-                                currentPage === item.href
+                                isNavigationItemActive(currentPage, item.href)
                                   ? 'bg-gray-50 text-primary'
                                   : 'text-gray-700 hover:bg-gray-50 hover:text-primary',
                                 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold items-center w-full text-left'
@@ -142,7 +92,7 @@ export function ResponsiveLayout({ children, onRefreshData, currentPage, onNavig
                             >
                               <item.icon
                                 className={classNames(
-                                  currentPage === item.href ? 'text-primary' : 'text-gray-400 group-hover:text-primary',
+                                  isNavigationItemActive(currentPage, item.href) ? 'text-primary' : 'text-gray-400 group-hover:text-primary',
                                   'h-6 w-6 shrink-0'
                                 )}
                               />
@@ -161,7 +111,7 @@ export function ResponsiveLayout({ children, onRefreshData, currentPage, onNavig
                       <div className="text-xs font-semibold text-gray-400 mb-2">ADMINISTRATION</div>
                       <ul className="-mx-2 space-y-1">
                         {secondaryNavigation.map((item) => (
-                          <li key={item.name}>
+                          <li key={item.id}>
                             <button
                               onClick={() => {
                                 onNavigate(item.href)
@@ -194,12 +144,12 @@ export function ResponsiveLayout({ children, onRefreshData, currentPage, onNavig
             <ul className="flex flex-1 flex-col gap-y-7">
               <li>
                 <ul className="-mx-2 space-y-1">
-                  {navigation.map((item) => (
-                    <li key={item.name}>
+                  {primaryNavigation.map((item) => (
+                    <li key={item.id}>
                       <button
                         onClick={() => onNavigate(item.href)}
                         className={classNames(
-                          currentPage === item.href
+                          isNavigationItemActive(currentPage, item.href)
                             ? 'bg-gray-50 text-primary'
                             : 'text-gray-700 hover:bg-gray-50 hover:text-primary',
                           'group flex gap-x-3 rounded-md p-2 text-sm font-semibold items-center w-full text-left'
@@ -207,7 +157,7 @@ export function ResponsiveLayout({ children, onRefreshData, currentPage, onNavig
                       >
                         <item.icon
                           className={classNames(
-                            currentPage === item.href ? 'text-primary' : 'text-gray-400 group-hover:text-primary',
+                            isNavigationItemActive(currentPage, item.href) ? 'text-primary' : 'text-gray-400 group-hover:text-primary',
                             'h-6 w-6 shrink-0'
                           )}
                         />
@@ -226,7 +176,7 @@ export function ResponsiveLayout({ children, onRefreshData, currentPage, onNavig
                 <div className="text-xs font-semibold text-gray-400 mb-2">ADMINISTRATION</div>
                 <ul className="-mx-2 space-y-1">
                   {secondaryNavigation.map((item) => (
-                    <li key={item.name}>
+                    <li key={item.id}>
                       <button
                         onClick={() => onNavigate(item.href)}
                         className="text-gray-700 hover:bg-gray-50 hover:text-primary group flex gap-x-3 rounded-md p-2 text-sm font-semibold w-full text-left"
