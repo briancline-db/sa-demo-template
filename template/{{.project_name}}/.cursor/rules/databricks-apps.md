@@ -22,17 +22,20 @@ You are a Databricks Apps expert who builds modern, production-ready web applica
 src/app/
 ├── src/                     # React source code
 │   ├── components/         # Reusable components
-│   │   ├── ui/            # shadcn/ui components
+│   │   ├── ui/            # shadcn/ui components (Badge, Button, Card, etc.)
+│   │   ├── layout/        # ResponsiveLayout (single layout system)
 │   │   ├── DatabricksCard.jsx
 │   │   ├── DatabricksChart.jsx
-│   │   └── layout/        # Layout components
-│   ├── pages/             # Page components
-│   ├── contexts/          # React contexts
-│   ├── lib/               # Utilities
+│   │   └── DatabricksLogo.jsx.tmpl
+│   ├── pages/             # Page components (ChatPage, CustomerSegmentationPage, etc.)
+│   ├── config/            # Centralized configuration
+│   │   └── navigation.js  # Single source of truth for navigation
+│   ├── lib/               # Utilities (utils.js)
+│   ├── styles/            # CSS files (index.css, responsive.css)
 │   └── main.jsx          # React entry point
-├── dist/                  # Vite build output
-├── public/               # Static assets
-├── app.js               # Express server
+├── dist/                  # Vite build output (auto-generated)
+├── public/               # Static assets (favicon, images)
+├── app.js               # Express server (ES modules)
 ├── package.json         # Dependencies and scripts
 ├── vite.config.js       # Vite configuration
 └── tailwind.config.js   # Tailwind configuration
@@ -228,18 +231,160 @@ app.use(helmet({
 }))
 ```
 
+## 🔧 **Codebase Modification Guide**
+
+### **🧭 Adding New Navigation Items**
+
+#### **Step 1: Update Navigation Configuration**
+Edit `src/config/navigation.js` to add new navigation items:
+
+```javascript
+// Add to primaryNavigation array
+{
+  id: 'new-feature',
+  name: 'New Feature',
+  href: 'new-feature',
+  icon: YourIcon, // Import from lucide-react
+  badge: 'New',
+  description: 'Description for accessibility',
+  disabled: false
+}
+```
+
+#### **Step 2: Add Route in App.jsx**
+Update the switch statement in `src/App.jsx`:
+
+```javascript
+case 'new-feature':
+  return <NewFeaturePage />
+```
+
+#### **Step 3: Navigation Changes Propagate Automatically**
+- ResponsiveLayout automatically uses centralized navigation
+- No need to update multiple components
+- Changes reflect immediately in both mobile and desktop
+
+### **📄 Adding New Pages**
+
+#### **Step 1: Create Page Component**
+Create new file in `src/pages/YourNewPage.jsx`:
+
+```javascript
+import React from 'react'
+import { DatabricksCard } from '../components/DatabricksCard'
+import { DatabricksChart } from '../components/DatabricksChart'
+
+export function YourNewPage() {
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Your New Feature</h1>
+      {/* Your page content */}
+    </div>
+  )
+}
+```
+
+#### **Step 2: Import in App.jsx**
+Add import and route case:
+
+```javascript
+import { YourNewPage } from './pages/YourNewPage'
+
+// In renderPage() switch statement
+case 'your-new-feature':
+  return <YourNewPage />
+```
+
+### **🎨 Adding New Components**
+
+#### **Main Components**: Place in `src/components/`
+```javascript
+// src/components/YourComponent.jsx
+import React from 'react'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+
+export function YourComponent({ data }) {
+  return (
+    <Card>
+      {/* Component content */}
+    </Card>
+  )
+}
+```
+
+#### **UI Components**: Use existing shadcn/ui components
+- Located in `src/components/ui/`
+- Import with `@/components/ui/component-name`
+- Pre-configured with Databricks design system
+
+### **📊 Modifying Data Sources**
+
+#### **Backend API Updates** (app.js):
+```javascript
+// Add new API endpoint
+app.get('/api/your-data', async (req, res) => {
+  try {
+    // TODO: Replace with actual Databricks query
+    const data = await queryDatabricks(`
+      SELECT * FROM ${catalog}.${schema}.your_table
+    `)
+    res.json(data)
+  } catch (error) {
+    // Fallback mock data for development
+    res.json(mockData)
+  }
+})
+```
+
+#### **Frontend Data Fetching**:
+```javascript
+// In your page component
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await fetch('/api/your-data')
+      const data = await response.json()
+      setData(data)
+    } catch (error) {
+      console.error('Failed to fetch data:', error)
+      setData(mockData) // Always provide fallback
+    }
+  }
+  fetchData()
+}, [])
+```
+
+### **🎯 Navigation Architecture Rules**
+
+#### **DO:**
+- ✅ **Always update navigation in `src/config/navigation.js`**
+- ✅ **Use the centralized `isNavigationItemActive` helper**
+- ✅ **Import navigation with destructuring**: `{ primaryNavigation, secondaryNavigation }`
+- ✅ **Use permissions array for admin-only features**
+- ✅ **Add descriptive tooltips for accessibility**
+
+#### **DON'T:**
+- ❌ **Never hardcode navigation arrays in components**
+- ❌ **Don't create custom navigation logic** - use helpers
+- ❌ **Avoid bypassing the centralized system**
+- ❌ **Don't forget to add new pages to App.jsx routing**
+
 ## 📱 Features & Capabilities
 
 ### Core Features:
 - **Dashboard**: KPI cards, charts, trends
-- **Chat Interface**: AI assistant integration
+- **Chat Interface**: AI assistant integration  
+- **Customer Segmentation**: Interactive CLV analysis with drill-down
+- **Demand Forecasting**: AI-driven predictions with cost impact
 - **Responsive Design**: Mobile-friendly layout
 - **Real-time Data**: API integration with Databricks
 - **Modern UI**: shadcn/ui components with Databricks branding
 
 ### Advanced Features:
-- **Theme Context**: Light/dark mode support
-- **Layout Context**: Responsive layout management
+- **Centralized Navigation**: Single source of truth eliminates duplication
+- **Interactive Demos**: Click-to-explore functionality
+- **Professional Visualizations**: Comprehensive charts and metrics
 - **Error Boundaries**: Graceful error handling
 - **Loading States**: Smooth user experience
 - **Fallback Data**: Development-friendly mock data
@@ -276,13 +421,112 @@ dist/
 
 ## 🎯 Development Guidelines
 
-1. **Always start with `npm run start:dev`** for development
+### **🚀 Quick Start Workflow**
+1. **Always start with `npm run start:dev`** for development (React dev + Express)
 2. **Build with `npm run build`** before deployment testing
-3. **Use shadcn/ui components** for consistent UI
-4. **Follow Databricks color scheme** in custom components
-5. **Implement responsive design** with Tailwind CSS
-6. **Provide fallback data** for offline development
-7. **Test production build locally** before deploying
+3. **Use centralized navigation** - never hardcode navigation arrays
+4. **Import shadcn/ui components** with `@/components/ui/` alias
+5. **Follow Databricks color scheme** in custom components
+6. **Implement responsive design** with Tailwind CSS classes
+7. **Provide fallback data** for offline development
+8. **Test production build locally** before deploying
+
+### **🔄 Common Development Tasks**
+
+#### **Adding a New Dashboard Page:**
+```bash
+# 1. Create page component
+touch src/pages/YourNewPage.jsx
+
+# 2. Add navigation item to src/config/navigation.js
+# 3. Add route case to src/App.jsx
+# 4. Import page component in App.jsx
+```
+
+#### **Customizing Existing Pages:**
+- **Overview**: Modify `src/App.jsx` dashboard content
+- **Customer Segmentation**: Edit `src/pages/CustomerSegmentationPage.jsx.tmpl`
+- **Demand Forecasting**: Edit `src/pages/DemandForecastingPage.jsx.tmpl`
+- **Chat**: Update `src/pages/ChatPage.jsx`
+
+#### **Adding New API Endpoints:**
+```javascript
+// In app.js - add after existing endpoints
+app.get('/api/your-endpoint', async (req, res) => {
+  try {
+    // Query Databricks or return mock data
+    res.json(data)
+  } catch (error) {
+    res.json(fallbackData)
+  }
+})
+```
+
+#### **Styling Updates:**
+- **Colors**: Update `tailwind.config.js.tmpl` 
+- **Components**: Use existing Databricks design tokens
+- **Layout**: Modify `src/components/layout/ResponsiveLayout.jsx`
+- **Global Styles**: Edit `src/styles/index.css`
+
+### **🧭 Navigation Management**
+
+#### **Primary Navigation** (Main features):
+```javascript
+// src/config/navigation.js - primaryNavigation array
+{
+  id: 'unique-id',
+  name: 'Display Name',
+  href: 'url-slug',
+  icon: LucideIcon,
+  badge: 'Optional', 
+  description: 'For accessibility'
+}
+```
+
+#### **Secondary Navigation** (Admin features):
+```javascript
+// src/config/navigation.js - secondaryNavigation array
+{
+  id: 'admin-feature',
+  name: 'Admin Feature',
+  href: 'admin-feature',
+  icon: Settings,
+  permissions: ['admin'] // Restrict access
+}
+```
+
+#### **Navigation Helper Functions:**
+- `isNavigationItemActive(currentPage, itemHref)` - Check active state
+- `filterNavigationByPermissions(items, userPermissions)` - Filter by access
+- `getNavigationItem(id)` - Get item by ID
+- `getNavigationWithBadges()` - Get items with badges
+
+### **📁 File Organization Rules**
+
+#### **Components Hierarchy:**
+```
+src/components/
+├── ui/                    # shadcn/ui components (don't modify)
+├── layout/               # ResponsiveLayout only
+├── DatabricksCard.jsx    # KPI card component
+├── DatabricksChart.jsx   # Chart component  
+└── DatabricksLogo.jsx.tmpl # Logo with templating
+```
+
+#### **Pages Structure:**
+```
+src/pages/
+├── ChatPage.jsx                    # AI chat interface
+├── CustomerSegmentationPage.jsx.tmpl # CLV analysis
+├── DemandForecastingPage.jsx.tmpl   # AI forecasting
+└── YourNewPage.jsx                 # Custom pages
+```
+
+#### **Configuration Files:**
+```
+src/config/
+└── navigation.js.tmpl    # Single source of truth for navigation
+```
 
 This architecture ensures scalable, maintainable, and performant Databricks Apps that integrate seamlessly with the Databricks platform while providing excellent user experience.
 
