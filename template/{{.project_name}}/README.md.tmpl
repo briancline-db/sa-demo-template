@@ -31,6 +31,10 @@ databricks bundle init https://github.com/briancline-db/sa-demo-template.git
 - **Real-time Capabilities** - OLTP integration with Lakebase
 - **AI/LLM Integration** - Conversational analytics with Mosaic AI
 - **Professional Styling** - Databricks branding and design system
+- **Enhanced UX** - ImprovedResponsiveLayout with mobile/desktop headers
+- **Accessibility** - ARIA labels, semantic HTML, keyboard navigation
+- **Permissions System** - Role-based navigation and feature access
+- **Modern Architecture** - Vite, ES modules, shadcn/ui components
 
 ## 📊 Industry Support
 
@@ -70,37 +74,53 @@ databricks bundle init https://github.com/briancline-db/sa-demo-template.git
 - Service quality analytics
 - Revenue optimization
 
-## 🏗️ Template Structure
+## 🏗️ Generated Project Structure
 
 ```
-project/
-├── databricks_template_schema.json    # Template configuration
-├── databricks.yml.tmpl               # Asset Bundle configuration
-├── pyproject.toml.tmpl               # Python project setup
-├── demo-requirements.md.tmpl         # Demo requirements template
-├── .cursor/rules/                    # AI assistant rules
-│   ├── demo-builder.md              # Main implementation guide
-│   ├── databricks-expert.md         # Platform best practices
-│   ├── react-styling.md             # Design system guide
-│   └── data-generation.md           # Data generation patterns
+{{.project_name}}/
+├── databricks.yml                    # Asset Bundle configuration
+├── pyproject.toml                   # Python project setup
+├── demo-requirements.md             # Demo requirements guide
+├── .cursor/rules/                   # AI assistant rules
+│   ├── demo-builder.md             # Main implementation guide
+│   ├── databricks-expert.md        # Platform best practices
+│   ├── react-styling.md            # Design system guide
+│   ├── data-generation.md          # Data generation patterns
+│   ├── databricks-apps.md          # Databricks Apps best practices
+│   └── databricks-platform.md      # Platform requirements
 ├── src/
-│   ├── {project_name}/              # Python data generation
-│   │   └── main.py.tmpl            # Industry-specific data
-│   └── app/                        # React dashboard
-│       ├── app.js.tmpl             # Express server + API
-│       ├── package.json.tmpl       # Node.js dependencies
-│       ├── tailwind.config.js.tmpl # Design system config
-│       ├── components/             # React components
-│       │   ├── databricks/        # Databricks-styled components
-│       │   └── charts/            # Chart components
-│       └── public/
-│           └── index.html.tmpl    # Main dashboard
-├── resources/                       # Bundle resources
-│   ├── {project_name}.job.yml.tmpl # Job configuration
-│   └── {project_name}.app.yml.tmpl # App configuration
-└── docs/                           # Documentation
-    ├── cursor-usage.md             # AI usage guide
-    └── databricks-patterns.md      # Best practices
+│   ├── {{.project_name}}/          # Python data generation
+│   │   └── main.py                 # Industry-specific data generation
+│   └── app/                        # React dashboard application
+│       ├── app.js                  # Express server + API endpoints
+│       ├── package.json            # Node.js dependencies
+│       ├── tailwind.config.js      # Databricks design system
+│       ├── vite.config.js          # Vite build configuration
+│       ├── index.html              # Vite entry point
+│       ├── src/                    # React source code
+│       │   ├── App.jsx             # Main application component
+│       │   ├── main.jsx            # React entry point
+│       │   ├── index.css           # Global styles
+│       │   ├── components/         # React components
+│       │   │   ├── layout/         # Layout components
+│       │   │   │   └── ImprovedResponsiveLayout.jsx # Enhanced layout
+│       │   │   ├── ui/             # shadcn/ui components
+│       │   │   ├── DatabricksCard.jsx  # KPI cards
+│       │   │   ├── DatabricksChart.jsx # Chart components
+│       │   │   └── DatabricksLogo.jsx  # Branding component
+│       │   ├── pages/              # Page components
+│       │   │   ├── ChatPage.jsx    # AI chat interface
+│       │   │   ├── CustomerSegmentationPage.jsx # CLV analysis
+│       │   │   └── DemandForecastingPage.jsx     # AI forecasting
+│       │   ├── config/             # Configuration
+│       │   │   └── navigation.js   # Centralized navigation
+│       │   ├── lib/                # Utilities
+│       │   │   └── utils.js        # Helper functions
+│       │   └── styles/             # Additional styles
+│       │       └── responsive.css  # Responsive utilities
+│       └── public/                 # Static assets
+│           └── databricks-favicon.svg
+└── .databricksignore               # Exclude build artifacts
 ```
 
 ## 🎨 Design System
@@ -113,23 +133,64 @@ project/
 
 ### **Component Library**
 ```jsx
-// KPI Cards
+// Enhanced Layout with Headers and Navigation
+<ImprovedResponsiveLayout 
+  currentPage="overview"
+  onNavigate={handleNavigation}
+  onRefreshData={handleRefresh}
+  userPermissions={['user', 'admin']}
+>
+  {children}
+</ImprovedResponsiveLayout>
+
+// KPI Cards with Trend Indicators
 <DatabricksCard
   title="Total Revenue"
   value="$2.4M"
-  trend={ { direction: 'up', value: '+12%' } }
+  trend={{direction: 'up', value: '+12%'}}
   icon={DollarSignIcon}
+  className="hover:scale-105 transition-all"
 />
 
-// Charts
+// Professional Charts with Databricks Styling
 <DatabricksChart
   type="line"
   data={chartData}
-  xKey="month"
-  yKeys={['revenue', 'customers']}
-  title="Revenue Trends"
+  xAxisKey="month"
+  yAxisKey="revenue"
+  additionalLines={[
+    { key: 'customers', color: '#3b82f6' }
+  ]}
+  height={300}
 />
+
+// Interactive Page Components
+<CustomerSegmentationPage />
+<DemandForecastingPage />
+<ChatPage />
 ```
+
+## 🚀 Enhanced User Experience
+
+### **ImprovedResponsiveLayout Features**
+- **Desktop Header** - Search bar, refresh button, notifications, user menu
+- **Mobile Optimization** - Touch-friendly icons, slide-out navigation  
+- **Live Data Indicator** - Real-time connection status with animated badge
+- **Permissions-Based Navigation** - Role-based menu filtering (admin/user)
+- **Accessibility Compliance** - ARIA labels, semantic HTML, keyboard support
+- **Professional Design** - Consistent spacing, typography, and interactions
+
+### **Interactive Demo Pages**
+- **Customer Segmentation** - CLV analysis with drill-down functionality
+- **Demand Forecasting** - AI impact metrics and regional performance
+- **Chat Interface** - Conversational analytics with typing indicators
+- **Centralized Navigation** - Single source of truth eliminates duplication
+
+### **Modern Development Stack**
+- **Vite Build System** - Fast HMR and optimized production builds
+- **ES Modules** - Modern JavaScript with proper import/export
+- **shadcn/ui Components** - Professional UI components with Databricks styling
+- **Databricks Apps Compliance** - Auto-detection, port binding, graceful shutdown
 
 ## 🤖 AI Assistant Features
 
@@ -208,11 +269,13 @@ monitoring, customer segmentation, and predictive risk scoring."
 - **Unity Catalog** - Data governance
 
 ### **Frontend**
-- **React 18** - Modern UI framework
-- **Express.js** - API server
-- **Tailwind CSS** - Utility-first styling
-- **Recharts** - Professional visualizations
+- **React 18** - Modern UI framework with ES modules
+- **Vite** - Fast development and optimized builds
+- **Express.js** - API server with Databricks Apps compliance
+- **Tailwind CSS + shadcn/ui** - Databricks design system
+- **Recharts** - Professional data visualizations
 - **Lucide Icons** - Beautiful iconography
+- **ImprovedResponsiveLayout** - Enhanced mobile/desktop UX
 
 ### **Infrastructure**
 - **Databricks Asset Bundle** - Unified deployment
@@ -276,12 +339,26 @@ monitoring, customer segmentation, and predictive risk scoring."
 
 ### **Local Development**
 ```bash
-# Install dependencies
-npm install
-pip install -r requirements.txt
+# Navigate to project directory
+cd {{.project_name}}
 
-# Run development server
-npm run dev
+# Install Python dependencies
+pip install -e .
+
+# Install Node.js dependencies
+cd src/app
+npm install
+
+# Development mode (React dev server + Express API)
+npm run start:dev
+
+# Or run components separately:
+npm run dev      # Vite dev server (frontend only)
+npm run server   # Express API server only
+
+# Production build and serve
+npm run build    # Build for production
+npm run start    # Serve built application
 ```
 
 ### **Databricks Deployment**
