@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { DollarSign, Users, TrendingUp, Activity } from 'lucide-react'
 import { DatabricksCard } from './components/DatabricksCard'
 import { DatabricksChart } from './components/DatabricksChart'
-import { ResponsiveLayout } from './components/layout/ResponsiveLayout'
+import { ImprovedResponsiveLayout } from './components/layout/ImprovedResponsiveLayout'
 import { ChatPage } from './pages/ChatPage'
 import { CustomerSegmentationPage } from './pages/CustomerSegmentationPage'
 import { DemandForecastingPage } from './pages/DemandForecastingPage'
@@ -239,13 +239,14 @@ function App() {
   }
 
   return (
-    <ResponsiveLayout 
+    <ImprovedResponsiveLayout 
       onRefreshData={handleRefreshData}
       currentPage={currentPage}
       onNavigate={setCurrentPage}
+      userPermissions={['user', 'admin']} // Demo permissions
     >
       {renderPage()}
-    </ResponsiveLayout>
+    </ImprovedResponsiveLayout>
   )
 }
 
