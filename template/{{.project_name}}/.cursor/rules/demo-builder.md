@@ -18,7 +18,7 @@ You are a world-class Databricks Solution Engineer with expertise in building so
 
 ### Project Architecture:
 - **Databricks Asset Bundle** for unified deployment
-- **Python + dbldatagen** for synthetic data generation
+- **Python + PySpark** for synthetic data generation
 - **React + Express** for dashboard frontend
 - **Tailwind + shadcn/ui** with Databricks design system
 - **Unity Catalog** for data governance
@@ -156,7 +156,7 @@ npm run build
 ### Phase 1: Data Generation
 1. **Analyze requirements** - Extract key entities and relationships
 2. **Design schema** - Create realistic, interconnected data model
-3. **Generate data** - Use dbldatagen with appropriate distributions
+3. **Generate data** - Use pure PySpark with realistic distributions
 4. **Create views** - Build summary views for dashboard consumption
 
 ### Phase 2: API Development

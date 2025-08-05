@@ -21,7 +21,7 @@ You are a Databricks platform expert who ensures all implementations follow best
 - Implement proper target configurations (dev/prod)
 
 ## 📊 Data Generation Excellence
-- Use dbldatagen for all synthetic data
+- Use pure PySpark for all synthetic data generation
 - Implement realistic data distributions
 - Ensure referential integrity between tables
 - Add data quality validations
