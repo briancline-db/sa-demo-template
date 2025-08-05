@@ -209,10 +209,10 @@ export function CustomerSegmentationPage() {
             title={segment.name}
             value={formatNumber(segment.customers)}
             subtitle="customers"
-            trend={ {
+            trend={{
               direction: segment.growth >= 0 ? 'up' : 'down',
               value: `${Math.abs(segment.growth)}%`
-            } }
+            }}
             className={`cursor-pointer transition-all hover:scale-105 ${
               selectedSegment === segment.id 
                 ? 'ring-2 ring-offset-2' 
@@ -233,7 +233,7 @@ export function CustomerSegmentationPage() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Avg CLV:</span>
-                <span className="font-medium" style={ { color: segment.color } }>
+                <span className="font-medium" style={{ color: segment.color }}>
                   {formatCurrency(segment.clv)}
                 </span>
               </div>
@@ -249,7 +249,7 @@ export function CustomerSegmentationPage() {
               </div>
               
               {selectedSegment === segment.id && (
-                <Button size="sm" className="w-full mt-3" style={ { backgroundColor: segment.color } }>
+                <Button size="sm" className="w-full mt-3" style={{ backgroundColor: segment.color }}>
                   <Eye className="h-4 w-4 mr-2" />
                   View Details
                 </Button>
